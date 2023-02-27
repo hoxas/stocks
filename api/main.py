@@ -14,8 +14,7 @@ connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
 
 
-@app.route("/api/<ticker>")
-def fetch(ticker):
+def fetchOne(ticker):
     price = r.get(ticker)
     if price is None:
         print(f'Fetching price: {ticker}')
@@ -27,20 +26,31 @@ def fetch(ticker):
         for method, properties, body in channel.consume('amq.rabbitmq.reply-to', auto_ack=True):
             price = handle_message(channel, method, properties, body)
             break
-
-        r.set(ticker, price, ex=60)
+        if price == 'Invalid Ticker':
+            r.set(ticker, price, ex=86400)
+        else:
+            r.set(ticker, price, ex=60)
     else:
         price = price.decode()
         print(f'DB Hit: {ticker}: {price}')
-    return json.dumps({
+    return {
         'ticker': ticker,
         'price': price,
-    })
+    }
 
 
 def handle_message(ch, method, properties, body):
     ch.cancel()
     return body.decode()
+
+
+@app.route("/api/<list_of_tickers>", methods=['GET'])
+def getMany(list_of_tickers):
+    list_of_tickers = list_of_tickers.split(',')
+    prices_list = []
+    for ticker in list_of_tickers:
+        prices_list.append(fetchOne(ticker))
+    return json.dumps(prices_list)
 
 
 app.run('0.0.0.0', 5000)
