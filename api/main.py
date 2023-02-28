@@ -4,16 +4,18 @@ import pika
 import json
 from flask_cors import CORS
 
-r = redis.Redis(host='localhost', port=6379, db=0, password="root")
+r = redis.Redis(host='redis', port=6379, db=0, password="root")
 
-app = Flask(__name__)
-CORS(app)
 
 credentials = pika.PlainCredentials('root', 'root')
 connection_parameters = pika.ConnectionParameters(
-    'localhost', 5672, '/', credentials)
+    'rabbitmq', 5672, '/', credentials)
 connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
+
+
+app = Flask(__name__)
+CORS(app)
 
 
 def fetchOne(ticker):

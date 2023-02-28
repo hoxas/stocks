@@ -6,7 +6,7 @@ class RabbitMQ:
     def __init__(self):
         credentials = pika.PlainCredentials('root', 'root')
         connection_parameters = pika.ConnectionParameters(
-            'localhost', 5672, '/', credentials)
+            'rabbitmq', 5672, '/', credentials)
         connection = pika.BlockingConnection(connection_parameters)
         channel = connection.channel()
         queue = channel.queue_declare(queue='fetch', exclusive=True)
