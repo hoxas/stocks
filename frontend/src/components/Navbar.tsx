@@ -12,7 +12,9 @@ export default function Navbar(props: NavbarProps) {
   function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
     const ticker = input.current!.value.toUpperCase();
-    setTickerSearch(ticker);
+    if (ticker != "") {
+      setTickerSearch(ticker);
+    }
   }
 
   return (
