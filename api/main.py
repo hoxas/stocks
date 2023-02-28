@@ -3,6 +3,8 @@ import redis
 import pika
 import json
 from flask_cors import CORS
+from threading import Thread
+import time
 
 r = redis.Redis(host='redis', port=6379, db=0, password="root")
 
@@ -12,6 +14,19 @@ connection_parameters = pika.ConnectionParameters(
     'rabbitmq', 5672, '/', credentials)
 connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
+
+
+def send_heartbeat(connection):
+    while True:
+        print('sending heartbeat')
+        connection.process_data_events()
+        time.sleep(50)
+
+
+heartbeat_thread = Thread(target=send_heartbeat, args=[connection])
+heartbeat_thread.start()
+
+connection.process_data_events()
 
 
 app = Flask(__name__)
