@@ -27,7 +27,11 @@ export default function Main(props: MainProps) {
   return (
     <div id="main" className="flex justify-around py-5 pt-8 px-2 sm:px-0">
       <SelectedStock curTicker={curTicker} setStockList={setStockList} />
-      <StockList stockList={stockList} setStockList={setStockList} />
+      <StockList
+        stockList={stockList}
+        setStockList={setStockList}
+        setTickerSearch={setTickerSearch}
+      />
     </div>
   );
 }
