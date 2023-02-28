@@ -1,14 +1,19 @@
 interface SelectedStockProps {
   curTicker: TickerInterface;
+  setStockList: any;
 }
 
-interface TickerInterface {
+export interface TickerInterface {
   ticker: string;
   price: string;
 }
 
 export default function SelectedStock(props: SelectedStockProps) {
-  const curTicker = props.curTicker;
+  const [curTicker, setStockList] = [props.curTicker, props.setStockList];
+
+  function handleBookmark() {
+    setStockList((stockList: Object[]) => [...stockList, curTicker]);
+  }
 
   return (
     <div
@@ -21,7 +26,10 @@ export default function SelectedStock(props: SelectedStockProps) {
           <a className="bg-gray-900 text-white/50 p-2 rounded-md hover:text-white smooth-hover">
             <i className="fa fa-refresh"></i>
           </a>
-          <a className="bg-gray-900 text-white/50 p-2 rounded-md hover:text-white smooth-hover">
+          <a
+            className="bg-gray-900 text-white/50 p-2 rounded-md hover:text-white smooth-hover"
+            onClick={handleBookmark}
+          >
             <i className="fa fa-bookmark"></i>
           </a>
         </div>

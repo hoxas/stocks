@@ -1,6 +1,14 @@
 import ListItem from "./StockListItem";
+import { TickerInterface } from "./SelectedStock";
 
-export default function StockList() {
+interface StockListProps {
+  stockList: TickerInterface[];
+  setStockList: any;
+}
+
+export default function StockList(props: StockListProps) {
+  const [stockList, setStockList] = [props.stockList, props.setStockList];
+
   return (
     <div id="stock-list" className="flex-grow px-5 py-4">
       <div className="flex justify-between items-center">
@@ -15,13 +23,9 @@ export default function StockList() {
         </div>
       </div>
       <ul className="mt-5 bg-gray-700">
-        <ListItem>stock 1</ListItem>
-        <ListItem>stock 2</ListItem>
-        <ListItem>stock 3</ListItem>
-        <ListItem>stock 3</ListItem>
-        <ListItem>stock 3</ListItem>
-        <ListItem>stock 3</ListItem>
-        <ListItem>stock 3</ListItem>
+        {stockList.map((stock, i) => (
+          <ListItem key={i} stock={stock} />
+        ))}
       </ul>
     </div>
   );

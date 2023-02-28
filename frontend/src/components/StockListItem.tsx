@@ -1,5 +1,14 @@
-import { PropsWithChildren } from "react";
+import { TickerInterface } from "./SelectedStock";
 
-export default function ListItem(props: PropsWithChildren) {
-  return <li className="p-2 hover:bg-gray-600">{props.children}</li>;
+interface ListItemProps {
+  stock: TickerInterface;
+}
+
+export default function ListItem(props: ListItemProps) {
+  return (
+    <li className="p-2 hover:bg-gray-600 inline-flex justify-between">
+      <span>{props.stock.ticker}</span>
+      <span>{props.stock.price}</span>
+    </li>
+  );
 }
