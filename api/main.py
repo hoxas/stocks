@@ -2,10 +2,12 @@ from flask import Flask
 import redis
 import pika
 import json
+from flask_cors import CORS
 
 r = redis.Redis(host='localhost', port=6379, db=0, password="root")
 
 app = Flask(__name__)
+CORS(app)
 
 credentials = pika.PlainCredentials('root', 'root')
 connection_parameters = pika.ConnectionParameters(
@@ -42,6 +44,11 @@ def fetchOne(ticker):
 def handle_message(ch, method, properties, body):
     ch.cancel()
     return body.decode()
+
+
+@app.route("/api/", methods=['GET'])
+def main():
+    return "RUNNING"
 
 
 @app.route("/api/<list_of_tickers>", methods=['GET'])
