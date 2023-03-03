@@ -3,8 +3,8 @@ version: "3"
 services:
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./api/Dockerfile
     restart: always
     depends_on:
       - rabbitmq
@@ -14,13 +14,14 @@ services:
       - redis-net
     volumes:
       - ./api:/app
+      - ./common:/app/common
     ports:
       - 5000:5000
 
   fetcher:
     build:
-      context: ./fetcher
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./fetcher/Dockerfile
     restart: always
     depends_on:
       - rabbitmq
@@ -29,6 +30,7 @@ services:
       - rabbitmq-net
     volumes:
       - ./fetcher:/app
+      - ./common:/app/common
 
   rabbitmq:
     image: rabbitmq:management-alpine
