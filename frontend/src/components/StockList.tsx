@@ -32,7 +32,13 @@ export default function StockList(props: StockListProps) {
         style={{ maxHeight: "50vh", overflow: "scroll" }}
       >
         {stockList.map((stock, i) => (
-          <ListItem key={i} stock={stock} setTickerSearch={setTickerSearch} />
+          <ListItem
+            key={i}
+            stock={stock}
+            setTickerSearch={setTickerSearch}
+            stockList={stockList}
+            setStockList={setStockList}
+          />
         ))}
       </ul>
     </div>
