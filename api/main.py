@@ -1,80 +1,90 @@
 from flask import Flask
 import redis
-import pika
 import json
 from flask_cors import CORS
-from threading import Thread
-import time
-
-r = redis.Redis(host='redis', port=6379, db=0, password="root")
+from typing import Dict
+from common.rmq import RmqConnection
 
 
-credentials = pika.PlainCredentials('root', 'root')
-connection_parameters = pika.ConnectionParameters(
-    'rabbitmq', 5672, '/', credentials)
-connection = pika.BlockingConnection(connection_parameters)
-channel = connection.channel()
+class App:
+    def __init__(self, address='0.0.0.0', port=5000):
+        """API Flask App Wrapper Class
 
+        Args:
+            address (str, optional): Http address to run flask app. Defaults to '0.0.0.0'.
+            port (int, optional): Port to run flask app. Defaults to 5000.
+        """
+        self.redis = redis.Redis(
+            host='redis', port=6379, db=0, password="root")
+        self.rmq = RmqConnection()
+        self.app = Flask(__name__)
+        CORS(self.app)
+        self.setup_routes()
+        self.address = address
+        self.port = port
 
-def send_heartbeat(connection):
-    while True:
-        print('sending heartbeat')
-        connection.process_data_events()
-        time.sleep(50)
+    def fetchOne(self, ticker: str) -> Dict[str, any]:
+        """Fetch one ticker price
 
+        Args:
+            ticker (str): stock ticker
 
-heartbeat_thread = Thread(target=send_heartbeat, args=[connection])
-heartbeat_thread.start()
+        Returns:
+            dict: {'ticker': str, 'price': str}
+        """
 
-connection.process_data_events()
+        # Attempt to fetch from redis
+        price = self.redis.get(ticker)
 
+        if price is None:
+            # If failed to fetch from redis send request to rabbitmq exchange -> fetch queue
+            print(f'Fetching price: {ticker}')
+            next(self.rmq.channel.consume(queue='amq.rabbitmq.reply-to',
+                                          auto_ack=True, inactivity_timeout=0.1))
+            self.rmq.channel.basic_publish('', 'fetch', ticker, properties=self.rmq.properties(
+                reply_to='amq.rabbitmq.reply-to'))
 
-app = Flask(__name__)
-CORS(app)
-
-
-def fetchOne(ticker):
-    price = r.get(ticker)
-    if price is None:
-        print(f'Fetching price: {ticker}')
-        next(channel.consume(queue='amq.rabbitmq.reply-to',
-                             auto_ack=True, inactivity_timeout=0.1))
-        channel.basic_publish('', 'fetch', ticker, properties=pika.BasicProperties(
-            reply_to='amq.rabbitmq.reply-to'))
-
-        for method, properties, body in channel.consume('amq.rabbitmq.reply-to', auto_ack=True):
-            price = handle_message(channel, method, properties, body)
-            break
-        if price == 'Invalid Ticker':
-            r.set(ticker, price, ex=86400)
+            for method, properties, body in self.rmq.channel.consume('amq.rabbitmq.reply-to', auto_ack=True):
+                price = self.handle_rmq_reply(
+                    self.rmq.channel, method, properties, body)
+                break
+            if price == 'Invalid Ticker':
+                self.redis.set(ticker, price, ex=86400)
+            else:
+                self.redis.set(ticker, price, ex=60)
         else:
-            r.set(ticker, price, ex=60)
-    else:
-        price = price.decode()
-        print(f'DB Hit: {ticker}: {price}')
-    return {
-        'ticker': ticker,
-        'price': price,
-    }
+            # If db hit decode price response
+            price = price.decode()
+
+        return {
+            'ticker': ticker,
+            'price': price,
+        }
+
+    def handle_rmq_reply(self, ch, method, properties, body):
+        ch.cancel()
+        return body.decode()
+
+    ### Routes ###
+
+    def main(self):
+        return "RUNNING"
+
+    def getMany(self, list_of_tickers):
+        list_of_tickers = list_of_tickers.split(',')
+        prices_list = []
+        for ticker in list_of_tickers:
+            prices_list.append(self.fetchOne(ticker))
+        return json.dumps(prices_list)
+
+    def setup_routes(self):
+        self.app.add_url_rule('/api/', 'main', self.main, methods=['GET'])
+        self.app.add_url_rule('/api/<list_of_tickers>',
+                              'getMany', self.getMany, methods=['GET'])
+
+    def run(self):
+        self.app.run(self.address, self.port)
 
 
-def handle_message(ch, method, properties, body):
-    ch.cancel()
-    return body.decode()
-
-
-@app.route("/api/", methods=['GET'])
-def main():
-    return "RUNNING"
-
-
-@app.route("/api/<list_of_tickers>", methods=['GET'])
-def getMany(list_of_tickers):
-    list_of_tickers = list_of_tickers.split(',')
-    prices_list = []
-    for ticker in list_of_tickers:
-        prices_list.append(fetchOne(ticker))
-    return json.dumps(prices_list)
-
-
-app.run('0.0.0.0', 5000)
+if __name__ == "__main__":
+    App().run()
