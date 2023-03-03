@@ -1,20 +1,16 @@
-import pika
 import yfinance as yf
+from common.rmq import RmqConnection
 
 
-class RabbitMQ:
+class App:
     def __init__(self):
-        credentials = pika.PlainCredentials('root', 'root')
-        connection_parameters = pika.ConnectionParameters(
-            'rabbitmq', 5672, '/', credentials)
-        connection = pika.BlockingConnection(connection_parameters)
-        channel = connection.channel()
-        queue = channel.queue_declare(queue='fetch', exclusive=True)
-        channel.basic_consume(queue=queue.method.queue,
-                              on_message_callback=self.on_message)
-        self.channel = channel
+        # Establish rmq connection
+        self.rmq = RmqConnection(send_heartbeat=False)
+        queue = self.rmq.channel.queue_declare(queue='fetch', exclusive=True)
+        self.rmq.channel.basic_consume(queue=queue.method.queue,
+                                       on_message_callback=self.on_rmq_message)
 
-    def on_message(self, channel, method, properties, body):
+    def on_rmq_message(self, channel, method, properties, body):
         print(method.delivery_tag)
         try:
             ticker = body.decode()
@@ -32,9 +28,8 @@ class RabbitMQ:
 
     def run(self):
         print('Consuming...')
-        self.channel.start_consuming()
+        self.rmq.channel.start_consuming()
 
 
 if __name__ == '__main__':
-    app = RabbitMQ()
-    app.run()
+    App().run()
