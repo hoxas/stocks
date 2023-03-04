@@ -2,7 +2,6 @@ from flask import Flask
 import redis
 import json
 from flask_cors import CORS
-from typing import Dict
 from common.rmq import RmqConnection
 
 
@@ -23,7 +22,7 @@ class App:
         self.address = address
         self.port = port
 
-    def fetchOne(self, ticker: str) -> Dict[str, any]:
+    def fetchOne(self, ticker: str) -> dict[str, str]:
         """Fetch one ticker price
 
         Args:
@@ -70,11 +69,9 @@ class App:
     def main(self):
         return "RUNNING"
 
-    def getMany(self, list_of_tickers):
-        list_of_tickers = list_of_tickers.split(',')
-        prices_list = []
-        for ticker in list_of_tickers:
-            prices_list.append(self.fetchOne(ticker))
+    def getMany(self, list_of_tickers: str):
+        list_of_tickers: list[str] =list_of_tickers.split(',')
+        prices_list = [self.fetchOne(ticker.strip()) for ticker in list_of_tickers]
         return json.dumps(prices_list)
 
     def setup_routes(self):
