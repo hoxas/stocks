@@ -95,7 +95,13 @@ class TestApi(unittest.TestCase):
 
 
 
+    def test_handle_rmq_reply(self):
+        app = App()
+        channel = mock.MagicMock()
         
+        result = app.handle_rmq_reply(channel, 'method', 'properties', b'decoded')
+        channel.cancel.assert_called_once()
+        assert result == 'decoded'
         
 
         
