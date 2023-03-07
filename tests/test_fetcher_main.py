@@ -42,3 +42,10 @@ class TestApi(unittest.TestCase):
         rmq_instance.channel.basic_publish.assert_called_with('', routing_key=properties.reply_to, body='Invalid Ticker')
         rmq_instance.channel.basic_ack.assert_called_with(delivery_tag=method.delivery_tag)
 
+    def test_app_run(self):
+        app = App()
+        rmq_instance = self.rmq.return_value
+
+        app.run()
+        rmq_instance.channel.start_consuming.assert_called_once()
+
