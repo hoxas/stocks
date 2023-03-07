@@ -93,8 +93,6 @@ class TestApi(unittest.TestCase):
             handle_rmq_reply.assert_called_with(rmq_instance.channel, 'method', 'properties', b'Invalid Ticker')
             redis_conn.set.assert_called_with(ticker, 'Invalid Ticker', ex=86400)
 
-
-
     def test_handle_rmq_reply(self):
         app = App()
         channel = mock.MagicMock()
@@ -102,8 +100,8 @@ class TestApi(unittest.TestCase):
         result = app.handle_rmq_reply(channel, 'method', 'properties', b'decoded')
         channel.cancel.assert_called_once()
         assert result == 'decoded'
-        
 
-        
-        
-        
+    def test_main(self):
+        result = App().main()
+        assert result == 'RUNNING'
+
