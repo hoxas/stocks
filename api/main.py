@@ -18,7 +18,6 @@ class App:
         self.rmq = RmqConnection()
         self.app = Flask(__name__)
         CORS(self.app)
-        self.setup_routes()
         self.address = address
         self.port = port
 
@@ -37,7 +36,7 @@ class App:
 
         if price is None:
             # If failed to fetch from redis send request to rabbitmq exchange -> fetch queue
-            print(f'Fetching price: {ticker}')
+            # print(f'Fetching price: {ticker}')
             next(self.rmq.channel.consume(queue='amq.rabbitmq.reply-to',
                                           auto_ack=True, inactivity_timeout=0.1))
             self.rmq.channel.basic_publish('', 'fetch', ticker, properties=self.rmq.properties(
@@ -80,6 +79,7 @@ class App:
                               'get_many', self.get_many, methods=['GET'])
 
     def run(self):
+        self.setup_routes()
         self.app.run(self.address, self.port)
 
 
