@@ -136,7 +136,15 @@ class TestApi(unittest.TestCase):
         assert flask_instance.add_url_rule.call_args_list[0] == mock.call('/api/', 'main', app.main, methods=['GET'])
         assert flask_instance.add_url_rule.call_args_list[1] == mock.call('/api/<list_of_tickers>', 'get_many', app.get_many, methods=['GET'])
 
-        
+    def test_run(self):
+        app = App()
+        flask_instance = self.api_app.return_value
+
+        with mock.patch('api.main.App.setup_routes') as setup_routes:
+            app.run()
+            setup_routes.assert_called_once()
+            flask_instance.run.assert_called_with(app.address, app.port)
+
 
 
 
