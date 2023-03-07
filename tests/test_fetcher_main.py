@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 from fetcher.main import App
 
-class TestApi(unittest.TestCase):
+class TestFetcher(unittest.TestCase):
 
     def setUp(self):
         self.rmq = mock.patch('fetcher.main.RmqConnection', return_value=mock.MagicMock()).start()
