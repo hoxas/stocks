@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+import json
 from api.main import App, __name__ as main_name
 
 
@@ -104,4 +105,31 @@ class TestApi(unittest.TestCase):
     def test_main(self):
         result = App().main()
         assert result == 'RUNNING'
+
+    def test_get_many(self):
+        app = App()
+
+        with mock.patch('api.main.App.fetch_one') as fetch_one:
+            fetch_one.side_effect = lambda ticker: {'ticker': ticker, 'price': '15.0000'}
+
+            result = app.get_many('AMC')
+            assert result == json.dumps([{'ticker': 'AMC', 'price': '15.0000'}])
+            fetch_one.assert_called_with('AMC')
+
+            result = app.get_many('    AMC    ')
+            assert result == json.dumps([{'ticker': 'AMC', 'price': '15.0000'}])
+            fetch_one.assert_called_with('AMC')
+
+            result = app.get_many('AMC,   AAA , FPE ')
+            assert result == json.dumps([
+                {'ticker': 'AMC', 'price': '15.0000'},
+                {'ticker': 'AAA', 'price': '15.0000'},
+                {'ticker': 'FPE', 'price': '15.0000'},
+            ])
+            assert fetch_one.call_args_list[-1] == mock.call('FPE')
+            assert fetch_one.call_args_list[-2] == mock.call('AAA')
+            assert fetch_one.call_args_list[-3] == mock.call('AMC')
+
+
+
 
