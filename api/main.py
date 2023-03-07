@@ -69,15 +69,15 @@ class App:
     def main(self):
         return "RUNNING"
 
-    def getMany(self, list_of_tickers: str):
-        list_of_tickers: list[str] =list_of_tickers.split(',')
+    def get_many(self, list_of_tickers: str):
+        list_of_tickers: list[str] = list_of_tickers.split(',')
         prices_list = [self.fetch_one(ticker.strip()) for ticker in list_of_tickers]
         return json.dumps(prices_list)
 
     def setup_routes(self):
         self.app.add_url_rule('/api/', 'main', self.main, methods=['GET'])
         self.app.add_url_rule('/api/<list_of_tickers>',
-                              'getMany', self.getMany, methods=['GET'])
+                              'get_many', self.get_many, methods=['GET'])
 
     def run(self):
         self.app.run(self.address, self.port)
