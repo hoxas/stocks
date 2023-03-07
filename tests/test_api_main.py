@@ -9,9 +9,8 @@ class TestApi(unittest.TestCase):
     def setUp(self):
         self.redis = mock.patch('api.main.redis', spec=True).start()
         self.rmq = mock.patch('api.main.RmqConnection', return_value=mock.MagicMock()).start()
-        self.api_app = mock.patch('api.main.Flask', spec=True).start()
+        self.api_app = mock.patch('api.main.Flask', return_value=mock.MagicMock()).start()
         self.cors = mock.patch('api.main.CORS', spec=True).start()
-        self.setup_routes = mock.patch('api.main.App.setup_routes', spec=True).start()
         self.next = mock.patch('api.main.next').start()
 
         self.addCleanup(mock.patch.stopall)
@@ -24,7 +23,6 @@ class TestApi(unittest.TestCase):
         self.rmq.assert_called_once_with()
         self.api_app.assert_called_once_with(main_name)
         self.cors.assert_called_once_with(self.api_app(main_name))
-        self.setup_routes.assert_called_once()
         
         assert app.address == '0.0.0.0'
         assert app.port == 5000
@@ -36,7 +34,6 @@ class TestApi(unittest.TestCase):
         self.rmq.assert_called_once_with()
         self.api_app.assert_called_once_with(main_name)
         self.cors.assert_called_once_with(self.api_app(main_name))
-        self.setup_routes.assert_called_once()
         
         assert app.address == '127.0.0.80'
         assert app.port == 8000
@@ -130,6 +127,16 @@ class TestApi(unittest.TestCase):
             assert fetch_one.call_args_list[-2] == mock.call('AAA')
             assert fetch_one.call_args_list[-3] == mock.call('AMC')
 
+    def test_setup_routes(self):
+        app = App()
+
+        app.setup_routes()
+        flask_instance = self.api_app.return_value
+        flask_instance.add_url_rule.assert_called()
+        assert flask_instance.add_url_rule.call_args_list[0] == mock.call('/api/', 'main', app.main, methods=['GET'])
+        assert flask_instance.add_url_rule.call_args_list[1] == mock.call('/api/<list_of_tickers>', 'get_many', app.get_many, methods=['GET'])
+
+        
 
 
 
