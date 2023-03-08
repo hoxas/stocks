@@ -26,9 +26,12 @@ class RmqConnection:
             heartbeat_thread = Thread(target=self.__send_heartbeat)
             heartbeat_thread.start()
 
-    def __send_heartbeat(self):
+    def __send_heartbeat(self, test=False):
         """ Private send heartbeat loop """
         while True:
             print('sending heartbeat')
             self.conn.process_data_events()
             time.sleep(self.heartbeat_interval)
+            
+            if test:
+                break
