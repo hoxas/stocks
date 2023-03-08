@@ -22,5 +22,13 @@ class TestRmqConnection(unittest.TestCase):
         self.thread.assert_called_with(target=rmq._RmqConnection__send_heartbeat)
         heartbeat_thread.start.assert_called_once()
 
-
-        
+    def test_rmq_connection_init_custom(self):
+        rmq = RmqConnection(port=5000, username='user', password='password', send_heartbeat=False, heartbeat_interval=100)
+        assert rmq.heartbeat_interval == 100
+        assert rmq.properties == self.pika.BasicProperties
+        self.pika.PlainCredentials.assert_called_with('user', 'password')
+        credentials = self.pika.PlainCredentials.return_value
+        self.pika.ConnectionParameters.assert_called_with('rabbitmq', 5000, '/', credentials)
+        assert rmq.conn == self.pika.BlockingConnection()
+        assert rmq.channel == rmq.conn.channel()
+        self.thread.assert_not_called()
