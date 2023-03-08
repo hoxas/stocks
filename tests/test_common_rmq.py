@@ -6,6 +6,7 @@ class TestRmqConnection(unittest.TestCase):
     def setUp(self):
         self.pika = mock.patch('common.rmq.pika').start()
         self.thread = mock.patch('common.rmq.Thread').start()
+        self.time = mock.patch('common.rmq.time').start()
 
         self.addCleanup(mock.patch.stopall)
 
@@ -32,3 +33,18 @@ class TestRmqConnection(unittest.TestCase):
         assert rmq.conn == self.pika.BlockingConnection()
         assert rmq.channel == rmq.conn.channel()
         self.thread.assert_not_called()
+
+    def test_rmq___send_heartbeat(self):
+        rmq = RmqConnection()
+        
+        rmq._RmqConnection__send_heartbeat(test=True)
+        conn = self.pika.BlockingConnection.return_value
+        conn.process_data_events.assert_called_once()
+        self.time.sleep.assert_called_once_with(50)
+
+    def test_rmq___send_heartbeat_custom_interval(self):
+        rmq = RmqConnection(heartbeat_interval=100)
+
+        rmq._RmqConnection__send_heartbeat(test=True)
+        self.time.sleep.assert_called_once_with(100)
+
