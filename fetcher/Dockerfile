@@ -2,11 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY ./fetcher/requirements.txt .
-
-COPY ./fetcher/__init__.py .
-
-COPY ./fetcher/main.py .
+COPY ./fetcher .
 
 COPY ./common .
 

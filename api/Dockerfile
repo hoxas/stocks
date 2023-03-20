@@ -2,11 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY ./api/requirements.txt .
-
-COPY ./api/__init__.py .
-
-COPY ./api/main.py .
+COPY ./api .
 
 COPY ./common .
 
