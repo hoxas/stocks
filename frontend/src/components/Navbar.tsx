@@ -24,8 +24,8 @@ export default function Navbar(props: NavbarProps) {
       className="bg-gray-900 px-2 lg:px-4 py-2 lg:py-10 sm:rounded-xl flex justify-between items-center"
     >
       <span className="flex items-center">
-        <img src={StocksLogo} />
-        <h1 className="text-2xl lg:text-4xl m-1 px-2">StockPad</h1>
+        <img src={StocksLogo} className="px-1" />
+        <h1 className="text-2xl lg:text-4xl m-1 px-1">StockPad</h1>
       </span>
       <form onSubmit={handleSubmit}>
         <div id="input">
