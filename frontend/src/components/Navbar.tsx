@@ -1,4 +1,4 @@
-import { SyntheticEvent, createRef, HTMLInputTypeAttribute } from "react";
+import { SyntheticEvent, createRef } from "react";
 
 interface NavbarProps {
   setTickerSearch: any;
