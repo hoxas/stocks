@@ -1,4 +1,5 @@
 import { SyntheticEvent, createRef } from "react";
+import StocksLogo from "../assets/stocks.svg";
 
 interface NavbarProps {
   setTickerSearch: any;
@@ -22,7 +23,10 @@ export default function Navbar(props: NavbarProps) {
       id="navbar"
       className="bg-gray-900 px-2 lg:px-4 py-2 lg:py-10 sm:rounded-xl flex justify-between items-center"
     >
-      <h1 className="text-2xl lg:text-4xl m-1">StockPad</h1>
+      <span className="flex items-center">
+        <img src={StocksLogo} />
+        <h1 className="text-2xl lg:text-4xl m-1 px-2">StockPad</h1>
+      </span>
       <form onSubmit={handleSubmit}>
         <div id="input">
           <input
