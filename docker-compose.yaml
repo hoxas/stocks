@@ -1,6 +1,20 @@
 version: "3"
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - frontend-net
+    volumes:
+      - ./frontend:/app
+    ports:
+      - 3000:3000
+
   api:
     build:
       context: .
@@ -10,6 +24,7 @@ services:
       - rabbitmq
       - redis
     networks:
+      - frontend-net
       - rabbitmq-net
       - redis-net
     volumes:
@@ -56,6 +71,8 @@ services:
       REDIS_ARGS: "--requirepass root"
 
 networks:
+  frontend-net:
+    driver: bridge
   redis-net:
     driver: bridge
   rabbitmq-net:
