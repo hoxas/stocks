@@ -1,15 +1,14 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="./logo.svg" alt="Project logo"></a>
+ <img src="./banner.png" alt="Project logo"></a>
 </p>
-
-<h3 align="center">Stocks</h3>
 
 <div align="center">
 
-[![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/hoxas/stocks/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/hoxas/stocks/pulls)
+[![Status](https://img.shields.io/badge/status-WIP-yellow.svg)]()
+[![Status](https://img.shields.io/badge/coverage-99%-success.svg)]()
+[![GitHub Issues](https://img.shields.io/github/issues/hoxas/stocks.svg)](https://github.com/hoxas/stocks/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/hoxas/stocks.svg)](https://github.com/hoxas/stocks/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
