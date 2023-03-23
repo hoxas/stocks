@@ -160,7 +160,7 @@ python3.11 scripts/tests.py
 
 ### Coverage Report
 
-Virtually 100% coverage as I left out the "if \_\_name\_\_ == \_\_main\_\_" testing as I saw no real need for it and also chose not to add it to the coverage ignore.
+Virtually 100% coverage as I left out the "if \_\_name\_\_ == \_\_main\_\_" testing because I saw no real need for it and also chose not to add it to the coverage ignore.
 
 <table class="index" data-sortable>
     <thead>
