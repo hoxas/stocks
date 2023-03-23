@@ -6,7 +6,7 @@
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-WIP-yellow.svg)]()
-[![Coverage](https://img.shields.io/badge/coverage-99%-success.svg)]()
+[![Coverage](https://img.shields.io/badge/coverage-99%25-success.svg)]()
 [![GitHub Issues](https://img.shields.io/github/issues/hoxas/stocks.svg)](https://github.com/hoxas/stocks/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/hoxas/stocks.svg)](https://github.com/hoxas/stocks/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
